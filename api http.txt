@@ -1,0 +1,61 @@
+Códigos de estado HTTP
+
+En la siguiente tabla se enumeran y describen los códigos de estado HTTP que se pueden devolver.
+Códigos de estado HTTP
+Código de estado 	Mensaje de estado 	Descripción
+400 	solicitud incorrecta 	No se puede procesar la solicitud porque tiene un formato incorrecto o es incorrecta.
+401 	Sin autorizar 	La información de autenticación necesaria falta o no es válida para el recurso.
+403 	prohibido 	Se denegó el acceso al recurso solicitado. Es posible que el usuario no tenga permisos suficientes. Importante: Si se aplican directivas de acceso condicional a un recurso, es posible que se devuelva el error HTTP 403; Forbidden error=insufficent_claims. Para obtener más información sobre Microsoft Graph y el acceso condicional, consulte Instrucciones para desarrolladores para el acceso condicional de Azure Active Directory.
+404 	No encontrado 	El recurso solicitado no existe.
+405 	Método no permitido 	El método HTTP de la solicitud no se permite en el recurso.
+406 	No aceptable 	Este servicio no admite el formato solicitado en el encabezado Accept.
+409 	Conflicto 	El estado actual entra en conflicto con lo que espera la solicitud. Por ejemplo, puede que la carpeta principal especificada no exista.
+410 	Eliminado 	El recurso solicitado ya no está disponible en el servidor.
+411 	Longitud requerida 	Se requiere un encabezado Content-Length en la solicitud.
+412 	Error en la condición previa 	Una condición previa proporcionada en la solicitud (por ejemplo, un encabezado If-Match) no coincide con el estado actual del recurso.
+413 	Entidad de solicitud demasiado grande 	El tamaño de la solicitud supera el límite máximo.
+415 	Tipo de medio no compatible 	El servicio no admite el formato del tipo de contenido de la solicitud.
+416 	No se puede satisfacer el intervalo solicitado 	El intervalo de bytes especificado no es válido o no está disponible.
+422 	Entidad no procesable 	No se puede procesar la solicitud porque tiene un formato que no es correcto semánticamente.
+423 	Bloqueado 	El recurso al que se va a acceder está bloqueado.
+429 	Demasiadas solicitudes 	La aplicación cliente se limitó y no debe intentar repetir la solicitud hasta que haya transcurrido un intervalo de tiempo.
+500 	error interno del servidor 	Se produjo un error interno del servidor al procesar la solicitud.
+501 	No implementado 	La característica solicitada no está implementada.
+503 	Servicio no disponible 	El servicio no está disponible temporalmente debido a que se encuentra en mantenimiento o está sobrecargado. Puede repetir la solicitud después de un retraso, cuya longitud puede especificarse en un encabezado Retry-After.
+504 	Tiempo de espera agotado para la puerta de enlace 	Mientras actuaba como proxy, el servidor no recibió ninguna respuesta puntual del servidor ascendente al que necesitaba acceder para intentar completar la solicitud. Puede producirse junto con el error 503.
+507 	Almacenamiento insuficiente 	Se alcanzó la cuota de almacenamiento máxima.
+509 	Límite de ancho de banda excedido 	La aplicación se limitó, ya que superó el límite máximo de ancho de banda. La aplicación puede volver a intentar la solicitud una vez que haya transcurrido más tiempo.
+
+La respuesta de error es un objeto JSON único que contiene una propiedad única denominada error. Este objeto incluye todos los detalles del error. Puede usar la información que se devuelve aquí para reemplazar o complementar el código de estado HTTP. A continuación, se muestra un ejemplo de un cuerpo de error JSON completo.
+Tipo de recurso de error
+
+La respuesta de error es un objeto JSON único que contiene una propiedad única denominada error. Este objeto incluye todos los detalles del error. Puede usar la información que se devuelve aquí para reemplazar o complementar el código de estado HTTP. A continuación, se muestra un ejemplo de un cuerpo de error JSON completo.
+
+En la tabla y ejemplo de código siguientes se describe el esquema de una respuesta de error.
+Tipo de recurso de error
+Name 	Tipo 	Descripción
+code 	string 	Siempre se devuelve. Indica el tipo de error que se produjo. No es NULL.
+message 	string 	Siempre se devuelve. Describe el error de manera detallada y proporciona información de depuración adicional. No es NULL ni está vacío. La longitud máxima es de 1024 caracteres.
+innerError 	objeto 	Opcional. Objeto de error adicional que puede ser más específico que el error de nivel superior.
+target 	string 	Destino en el que se originó el error.
+Propiedad code
+
+La propiedad code contiene uno de los siguientes valores posibles. Las aplicaciones deben estar preparadas para administrar cualquiera de estos errores.
+Propiedad code
+Código 	Descripción
+accessDenied 	El autor de la llamada no tiene permiso para realizar la acción.
+generalException 	Error no especificado.
+invalidRequest 	La solicitud tiene un formato incorrecto o es incorrecta.
+itemNotFound 	No se encuentra el recurso.
+preconditionFailed 	Una condición previa proporcionada en la solicitud (por ejemplo, un encabezado If-Match) no coincide con el estado actual del recurso.
+resourceModified 	El recurso que se va a actualizar cambió desde que el autor de llamada lo leyó por última vez; normalmente, se trata de un error de coincidencia de una etiqueta de identidad.
+serviceNotAvailable 	El servicio no está disponible. Intente volver a realizar la solicitud después de un retraso. Es posible que haya un encabezado Retry-After.
+unauthenticated 	El autor de llamada no está autenticado.
+Propiedad de mensajes
+
+La propiedad message en la raíz contiene un mensaje de error pensado para que el desarrollador lo lea. Los mensajes de error no se localizan y no se deben mostrar directamente al usuario. Al controlar los errores, el código no debe comprobar los valores de message porque pueden cambiar en cualquier momento, y a menudo contienen información dinámica específica de la solicitud con error. Solo debe codificar los códigos de error devueltos en las propiedades code.
+Objeto InnerError
+
+El objeto innererror puede contener de forma recursiva más objetos innererror con códigos de error adicionales más específicos. Al administrar un error, las aplicaciones deben recorrer en bucle todos los códigos de error disponibles y usar el más detallado que comprendan.
+
+Hay algunos errores adicionales que la aplicación puede detectar en los objetos innererror anidados. No es necesario que las aplicaciones los administren, pero pueden hacerlo si quieren. El servicio puede agregar nuevos códigos de error o dejar de devolver los antiguos en cualquier momento, por lo que es importante que todas las aplicaciones puedan administrar los [códigos de error básicos].
